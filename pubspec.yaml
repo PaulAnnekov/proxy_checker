@@ -1,0 +1,10 @@
+name: proxy_checker
+version: 0.0.1
+description: Checks availability of passed proxies list.
+author: Paul Annekov <paul.annekov@gmail.com>
+homepage: https://github.com/PaulAnnekov/proxy_checker
+dependencies:
+  duct_tape:
+    git: https://github.com/PaulAnnekov/duct_tape.git
+  args: ">=0.12.2+3 <0.13.0"
+  logging: ">=0.9.3 <0.10.0"
