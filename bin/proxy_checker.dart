@@ -8,7 +8,7 @@
 import "dart:io";
 import "package:args/args.dart";
 import "package:logging/logging.dart";
-import "package:duct_tape/isolate_wrapper.dart";
+import "package:duct_tape/duct_tape.dart";
 import "package:proxy_checker/proxy_checker.dart";
 
 main(List<String> args) async {

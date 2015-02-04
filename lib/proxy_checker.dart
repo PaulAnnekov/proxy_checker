@@ -3,7 +3,7 @@ library rozetka_email_dumper;
 import "dart:io";
 import "dart:convert";
 import "package:logging/logging.dart";
-import "package:duct_tape/isolate_wrapper.dart";
+import "package:duct_tape/duct_tape.dart";
 
 class ProxyChecker implements IsolateWrapper {
   IsolateSpawned _isolate;
