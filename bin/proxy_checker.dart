@@ -23,8 +23,20 @@ main(List<String> args) async {
   argParser.addOption('proxy-list', abbr: 'p', defaultsTo: 'proxy.txt',
       help: 'Collect from Google search results: ":8080"  ":3128"  ":80" filetype:txt');
   argParser.addOption('proxy-valid', abbr: 'v', defaultsTo: 'proxy-valid.txt');
-  argParser.addOption('host-ip', abbr: 'i');
+  argParser.addOption('host-ip', abbr: 'i', help: 'Must be set to check for anonymity', defaultsTo: '');
+  argParser.addFlag('anonymous', abbr: 'a', help: 'Set to save only anonymous proxy', defaultsTo: false);
+  argParser.addFlag('help', abbr: 'h', help: 'Displays this usage guide');
   ArgResults results = argParser.parse(args);
+
+  if(results['help']) {
+    print(argParser.getUsage());
+    return;
+  }
+
+  if(results['anonymous'] && results['host-ip'].isEmpty) {
+    log.severe('Anonymous check is set but host ip is not passed. Use -i to pass host ip.');
+    return;
+  }
 
   File proxyFile = new File(results['proxy-list']);
   if(!proxyFile.existsSync()) {

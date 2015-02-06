@@ -41,7 +41,7 @@ class ProxyChecker implements IsolateWrapper {
         .then((HttpClientResponse response) {
           response.transform(UTF8.decoder).listen((String body) {
             if(!body.contains('Your browser software transmitted the '
-            'following HTTP headers') || body.contains(_hostIP))
+                'following HTTP headers') || (!_hostIP.isEmpty && body.contains(_hostIP)))
               return;
 
             _log.info('$proxy is valid');
