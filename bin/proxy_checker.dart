@@ -45,6 +45,11 @@ main(List<String> args) async {
     return;
   }
 
+  if(!results.wasParsed('host-ip')) {
+    log.severe('Host ip is not specified.');
+    return;
+  }
+
   File validFile = new File(results['proxy-valid']);
   if (validFile.existsSync())
     validFile.deleteSync();
