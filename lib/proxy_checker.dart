@@ -39,7 +39,9 @@ class ProxyChecker implements IsolateWrapper {
         .then((HttpClientRequest request) => request.close())
         .timeout(const Duration(seconds: 5))
         .then((HttpClientResponse response) {
-          response.transform(UTF8.decoder).listen((String body) {
+          response.transform(UTF8.decoder).handleError((_) {
+            // Do nothing.
+          }).listen((String body) {
             if(!body.contains('Your browser software transmitted the '
                 'following HTTP headers') || (!_hostIP.isEmpty && body.contains(_hostIP)))
               return;
@@ -47,8 +49,6 @@ class ProxyChecker implements IsolateWrapper {
             _log.info('$proxy is valid');
 
             _isolate.send(proxy);
-          }).onError(() {
-            // Do nothing.
           });
         })
         .catchError((e) {
