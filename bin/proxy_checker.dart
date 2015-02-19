@@ -6,6 +6,7 @@
  */
 
 import "dart:io";
+import "dart:math";
 import "package:args/args.dart";
 import "package:logging/logging.dart";
 import "package:duct_tape/duct_tape.dart";
@@ -17,6 +18,7 @@ main(List<String> args) async {
     print('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
 
+  Random random = new Random();
   final Logger log = new Logger('main');
 
   ArgParser argParser = new ArgParser();
@@ -24,6 +26,8 @@ main(List<String> args) async {
       help: 'Collect from Google search results: ":8080"  ":3128"  ":80" filetype:txt');
   argParser.addOption('proxy-valid', abbr: 'v', defaultsTo: 'proxy-valid.txt');
   argParser.addOption('host-ip', abbr: 'i', help: 'Must be set to check for anonymity', defaultsTo: '');
+  argParser.addFlag('random', abbr: 'n', help: 'Check IPs in random order', defaultsTo: true);
+  argParser.addOption('regex', abbr: 'r', help: 'Regex with capture group to get only proxy address with port', defaultsTo: '');
   argParser.addFlag('anonymous', abbr: 'a', help: 'Set to save only anonymous proxy', defaultsTo: false);
   argParser.addFlag('help', abbr: 'h', help: 'Displays this usage guide');
   ArgResults results = argParser.parse(args);
@@ -65,8 +69,12 @@ main(List<String> args) async {
     log.finest('Message from isolate: "$message"');
 
     if (message == 'getIP') {
-      if (!proxyIPs.isEmpty)
-        return proxyIPs.removeAt(0);
+      if (!proxyIPs.isEmpty) {
+        String line = proxyIPs.removeAt(results['random'] == true ? random.nextInt(proxyIPs.length) : 0);
+        String address = !results['regex'].isEmpty ? new RegExp(results['regex']).stringMatch(line) : line;
+
+        return address;
+      }
 
       log.info('Scanning done');
     } else if ((message as String).contains(':')) {
