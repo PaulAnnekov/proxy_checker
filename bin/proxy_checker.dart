@@ -27,7 +27,7 @@ main(List<String> args) async {
   argParser.addOption('proxy-valid', abbr: 'v', defaultsTo: 'proxy-valid.txt');
   argParser.addOption('host-ip', abbr: 'i', help: 'Must be set to check for anonymity', defaultsTo: '');
   argParser.addFlag('random', abbr: 'n', help: 'Check IPs in random order', defaultsTo: true);
-  argParser.addOption('regex', abbr: 'r', help: 'Regex with capture group to get only proxy address with port', defaultsTo: '');
+  argParser.addOption('regex', abbr: 'r', help: 'Regex with capture group to get only proxy address with port', defaultsTo: r'(\d+\.\d+\.\d+\.\d+:\d+)');
   argParser.addFlag('anonymous', abbr: 'a', help: 'Set to save only anonymous proxy', defaultsTo: false);
   argParser.addFlag('help', abbr: 'h', help: 'Displays this usage guide');
   ArgResults results = argParser.parse(args);
@@ -58,7 +58,14 @@ main(List<String> args) async {
   if (validFile.existsSync())
     validFile.deleteSync();
 
-  List<String> proxyIPs = proxyFile.readAsLinesSync();
+  List<String> proxyIPs = [];
+  List<String> fileLines = proxyFile.readAsLinesSync();
+  fileLines.forEach((String line) {
+    String address = !results['regex'].isEmpty ? new RegExp(results['regex']).stringMatch(line) : line;
+    if (address != null && !address.isEmpty) {
+      proxyIPs.add(address);
+    };
+  });
 
   IsolatesController isolatesController = new IsolatesController();
   isolatesController.spawn(new ProxyChecker(results['host-ip']));
@@ -70,10 +77,7 @@ main(List<String> args) async {
 
     if (message == 'getIP') {
       if (!proxyIPs.isEmpty) {
-        String line = proxyIPs.removeAt(results['random'] == true ? random.nextInt(proxyIPs.length) : 0);
-        String address = !results['regex'].isEmpty ? new RegExp(results['regex']).stringMatch(line) : line;
-
-        return address;
+        return proxyIPs.removeAt(results['random'] == true ? random.nextInt(proxyIPs.length) : 0);
       }
 
       log.info('Scanning done');
